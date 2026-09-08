@@ -1,0 +1,5 @@
+// Copy to Local.xcconfig (ignored by Git) before building for your iPhone.
+// Find your team in Xcode > Settings > Accounts.
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+FIRE_IOS_BUNDLE_ID = com.example.yourname.fire
+FIRE_BRIDGE_BUNDLE_ID = com.example.yourname.fire.bridge

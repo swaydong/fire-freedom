@@ -1,0 +1,143 @@
+name: FIREFreedom
+
+options:
+  bundleIdPrefix: com.local.firefreedom
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "17.0"
+    macOS: "14.0"
+  developmentLanguage: zh-Hans
+  xcodeVersion: "26.0"
+
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    CODE_SIGN_STYLE: Automatic
+
+packages:
+  FIREFreedomPackage:
+    path: .
+
+targets:
+  FIRE:
+    type: application
+    platform: iOS
+    sources:
+      - path: Apps/FIREiOS
+      - path: ThirdPartyLicenses
+        buildPhase: resources
+    dependencies:
+      - package: FIREFreedomPackage
+        product: FIRECore
+      - package: FIREFreedomPackage
+        product: FIREBridgeKit
+    info:
+      path: Apps/FIREiOS/Info.plist
+      properties:
+        CFBundleDisplayName: F.I.R.E
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        NSFaceIDUsageDescription: 用于保护你的账单、资产和财务自由进度。
+        NSLocalNetworkUsageDescription: 用于在同一局域网内连接你的 Mac 并生成 Codex 财务分析。
+        NSBonjourServices:
+          - _fire-freedom._tcp
+          - _fire-bridge._tcp
+        BGTaskSchedulerPermittedIdentifiers:
+          - $(PRODUCT_BUNDLE_IDENTIFIER).continued-processing.*
+        UIBackgroundModes:
+          - processing
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.local.fire.backup
+            UTTypeDescription: F.I.R.E 加密备份
+            UTTypeConformsTo:
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - firebackup
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: F.I.R.E 加密备份
+            CFBundleTypeRole: Editor
+            LSItemContentTypes:
+              - com.local.fire.backup
+          - CFBundleTypeName: Excel 工作簿
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - org.openxmlformats.spreadsheetml.sheet
+        LSSupportsOpeningDocumentsInPlace: false
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(FIRE_IOS_BUNDLE_ID)
+        PRODUCT_NAME: FIRE
+        GENERATE_INFOPLIST_FILE: false
+        SUPPORTS_MACCATALYST: false
+        TARGETED_DEVICE_FAMILY: "1"
+
+  FIREBridge:
+    type: application
+    platform: macOS
+    sources:
+      - path: Apps/FIREBridge
+      - path: ThirdPartyLicenses
+        buildPhase: resources
+    dependencies:
+      - package: FIREFreedomPackage
+        product: FIRECore
+      - package: FIREFreedomPackage
+        product: FIREBridgeKit
+    info:
+      path: Apps/FIREBridge/Info.plist
+      properties:
+        CFBundleDisplayName: F.I.R.E Bridge
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSUIElement: true
+        NSLocalNetworkUsageDescription: 用于与已配对的 F.I.R.E iPhone 在局域网内交换加密分析数据。
+        NSBonjourServices:
+          - _fire-freedom._tcp
+          - _fire-bridge._tcp
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(FIRE_BRIDGE_BUNDLE_ID)
+        PRODUCT_NAME: FIREBridge
+        GENERATE_INFOPLIST_FILE: false
+
+  FIREiOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Apps/FIREiOSTests
+    dependencies:
+      - target: FIRE
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.local.firefreedom.ios.tests
+        GENERATE_INFOPLIST_FILE: true
+
+schemes:
+  FIRE:
+    build:
+      targets:
+        FIRE: all
+        FIREiOSTests:
+          - test
+    run:
+      config: Debug
+    test:
+      targets:
+        - FIREiOSTests
+  FIREBridge:
+    build:
+      targets:
+        FIREBridge: all
+    run:
+      config: Debug

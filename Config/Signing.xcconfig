@@ -1,0 +1,5 @@
+// Simulator builds need no team. Put personal signing values in Local.xcconfig.
+DEVELOPMENT_TEAM =
+FIRE_IOS_BUNDLE_ID = com.local.firefreedom.ios
+FIRE_BRIDGE_BUNDLE_ID = com.local.firefreedom.bridge
+#include? "Local.xcconfig"
